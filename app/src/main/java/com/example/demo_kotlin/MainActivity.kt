@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         //Fragment nav
         //A qua B
         //A gọi vào pause -> stop -> destroyview -> lúc này viewmodel vẫn còn data, không cần phải load lại nữa,
-        //B back về AA -> onCreateView -> onViewCreated->onStart->onResume -> lúc này viewmodel tự động bắn về data cũ mà không cần load lại
+        //B back về AA -> onCreateView -> onViewCreated->onStart->onResume -> lúc này viewmodel tự động bắn về data cũ mà không cần load lại, viewmodel cũng không cần khởi tạo lại
 //
 //        button1 = findViewById(R.id.button1)
 //        button2 = findViewById(R.id.button2)

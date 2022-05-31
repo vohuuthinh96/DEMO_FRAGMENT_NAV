@@ -6,11 +6,13 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.example.demo_kotlin.viewmodel.AModel
+import java.util.*
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -24,6 +26,7 @@ private const val ARG_PARAM2 = "param2"
  */
 class FragmentA : Fragment() {
     private val model by viewModels<AModel>()
+    lateinit var button:Button
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d("thinhvh", "${this.javaClass.name} onCreate: ")
@@ -38,9 +41,10 @@ class FragmentA : Fragment() {
 
         val navController = findNavController()
 
-       var button:View = view.findViewById(R.id.btn);
+        button = view.findViewById(R.id.btn);
         button.setOnClickListener {
             navController.navigate(R.id.fragmentB)
+
         }
         Log.d("thinhvh", "${this.javaClass.name} onCreateView: ")
         return view
@@ -59,6 +63,7 @@ class FragmentA : Fragment() {
 
         model.data.observe(viewLifecycleOwner, Observer {
             Log.d("thinhvh", "data observe: $it")
+            button.text = Random().nextInt(1000).toString()
         })
 
     }

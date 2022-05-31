@@ -10,22 +10,25 @@
         android:name="com.example.demo_kotlin.FragmentA"
         android:label="fragment_a"
         tools:layout="@layout/fragment_a" >
+
         <action
-            android:id="@+id/action_fragmentA_to_fragmentC"
-            app:destination="@id/fragmentC" />
+            android:id="@+id/action_fragmentA_to_fragmentB"
+            app:destination="@id/fragmentB" />
     </fragment>
     <fragment
         android:id="@+id/fragmentB"
         android:name="com.example.demo_kotlin.FragmentB"
         android:label="fragment_b"
-        tools:layout="@layout/fragment_b" />
+        tools:layout="@layout/fragment_b" >
+        <action
+            android:id="@+id/action_fragmentB_to_fragmentC"
+            app:destination="@id/fragmentC" />
+    </fragment>
     <fragment
         android:id="@+id/fragmentC"
         android:name="com.example.demo_kotlin.FragmentC"
         android:label="fragment_c"
         tools:layout="@layout/fragment_c" >
-        <action
-            android:id="@+id/action_fragmentC_to_fragmentB"
-            app:destination="@id/fragmentB" />
+
     </fragment>
 </navigation>

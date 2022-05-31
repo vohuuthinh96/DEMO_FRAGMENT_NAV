@@ -37,7 +37,8 @@ class FragmentB : Fragment() {
 
         var button: View = view.findViewById(R.id.btn);
         button.setOnClickListener {
-            navController.navigate(R.id.fragmentC)
+//            navController.navigate(R.id.fragmentC)
+            navController.navigateUp()
         }
 
         Log.d("thinhvh", "${this.javaClass.name}  onCreateView: ")
