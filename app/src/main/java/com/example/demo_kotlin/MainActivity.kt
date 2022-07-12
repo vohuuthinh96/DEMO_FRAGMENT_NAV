@@ -1,16 +1,14 @@
 package com.example.demo_kotlin
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.TextView
-import androidx.lifecycle.LifecycleObserver
-import kotlinx.coroutines.*
-import java.lang.Runnable
-import kotlin.coroutines.CoroutineContext
-import kotlin.random.Random
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentResultListener
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 
 class MainActivity : AppCompatActivity() {
     private lateinit var button1: Button
@@ -116,4 +114,65 @@ class MainActivity : AppCompatActivity() {
 //            Log.d("thinhvh", ": ${throwable.message}")
     }
 
+    private val mResults = HashMap<String, Bundle>()
+    private val mResultListeners = HashMap<String, LifecycleAwareResultListener>()
+
+    fun setFragmentResult(requestKey: String, result: Bundle) {
+        val resultListener: LifecycleAwareResultListener? = mResultListeners[requestKey]
+        // nếu đã có listenner rồi thì bắn callback cho nó luôn và không add vào mResults nữa
+        if (resultListener != null && resultListener.isAtLeast(Lifecycle.State.STARTED)) {
+            resultListener.onFragmentResult(requestKey, result)
+        } else {
+            mResults.put(requestKey, result)
+        }
+    }
+
+    fun setFragmentResultListener(requestKey: String, lifecycleOwner: LifecycleOwner, listener: FragmentResultListener) {
+        val lifecycle = lifecycleOwner.lifecycle
+        if (lifecycle.currentState == Lifecycle.State.DESTROYED) {
+            // nếu trạng thái fragment là destroy thì không cho register
+            return
+        }
+
+        val observer: LifecycleEventObserver = object : LifecycleEventObserver {
+            override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+                if (event == Lifecycle.Event.ON_START) {
+                    val storedResult = mResults[requestKey]
+                    if (storedResult != null) {
+                        listener.onFragmentResult(requestKey, storedResult)
+                        clearFragmentResult(requestKey)
+                    }
+                }
+                if (event == Lifecycle.Event.ON_DESTROY) {
+                    lifecycle.removeObserver(this)
+                    mResultListeners.remove(requestKey)
+                }
+            }
+        }
+        lifecycle.addObserver(observer)
+        val storedListener: LifecycleAwareResultListener? = mResultListeners.put(requestKey, LifecycleAwareResultListener(lifecycle, listener, observer))
+        storedListener?.removeObserver()
+    }
+
+    private class LifecycleAwareResultListener  constructor(
+        private val mLifecycle: Lifecycle,
+        private val mListener: FragmentResultListener,
+        private val mObserver: LifecycleEventObserver
+    ) : FragmentResultListener {
+        fun isAtLeast(state: Lifecycle.State): Boolean {
+            return mLifecycle.currentState.isAtLeast(state)
+        }
+
+        override fun onFragmentResult(requestKey: String, result: Bundle) {
+            mListener.onFragmentResult(requestKey, result)
+        }
+
+        fun removeObserver() {
+            mLifecycle.removeObserver(mObserver)
+        }
+    }
+
+    fun clearFragmentResult(requestKey: String) {
+        mResults.remove(requestKey)
+    }
 }
